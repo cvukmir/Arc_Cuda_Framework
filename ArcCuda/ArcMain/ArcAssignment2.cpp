@@ -9,21 +9,28 @@
 #include "ArcAssignment2.h"
 
 // Arc Cuda
+#pragma comment(lib, "ArcCuda.lib")
 #include "ArcCudaMatrixMultiply.h"
 
 // Constants //
 
 const std::string OUTPUT_LINE     = std::string(25, '*') + std::string("\n");
-const int         MAX_ARRAY_SIZE  = 10;
-const int         MIN_ARRAY_SIZE  = 3;
-const int         MAX_ARRAY_VALUE = 100;
+const float       MAX_ARRAY_SIZE  = 10.0f;
+const float       MIN_ARRAY_SIZE  = 3.0f;
+const float       MAX_ARRAY_VALUE = 100.0f;
+const size_t      INT_SIZE        = sizeof(int);
+
+#define CALC_COLUMN_OFFSET(column) (INT_SIZE * column)
+#define CALC_RANDOM_FLOAT(randNum, max, min) (min + (static_cast<float>(randNum) / static_cast<float>(RAND_MAX / (max - min))))
+#define CALC_RANDOM_INT(randNum, max, min) (static_cast<int>(min + (float(randNum) / float(RAND_MAX / (max - min)))))
+// LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
 
 // Constructors //
 
 ArcAssignment2::ArcAssignment2() :
-	_ppMatrix1(nullptr),
-	_ppMatrix2(nullptr),
-	_ppMatrix3(nullptr),
+	_pMatrix1(nullptr),
+	_pMatrix2(nullptr),
+	_pMatrix3(nullptr),
 	_matrixSizeM(0),
 	_matrixSizeN(0),
 	_matrixSizeP(0)
@@ -32,33 +39,21 @@ ArcAssignment2::ArcAssignment2() :
 
 ArcAssignment2::~ArcAssignment2()
 {
-	if (_ppMatrix1 != nullptr)
+	if (_pMatrix1 != nullptr)
 	{
-		for (int i = 0; i < _matrixSizeM; ++i)
-		{
-			delete[] _ppMatrix1[i];
-		}
-		delete[] _ppMatrix1;
+		delete[] _pMatrix1;
 	}
 
-	if (_ppMatrix2 != nullptr)
+	if (_pMatrix2 != nullptr)
 	{
-		for (int i = 0; i < _matrixSizeN; ++i)
-		{
-			delete[] _ppMatrix2[i];
-		}
-		delete[] _ppMatrix2;
+		delete[] _pMatrix2;
 	}
 
-	if (_ppMatrix3 != nullptr)
+	if (_pMatrix3 != nullptr)
 	{
-		if (_ppMatrix3 != nullptr)
+		if (_pMatrix3 != nullptr)
 		{
-			for (int i = 0; i < _matrixSizeM; ++i)
-			{
-				delete[] _ppMatrix3[i];
-			}
-			delete[] _ppMatrix3;
+			delete[] _pMatrix3;
 		}
 	}
 }
@@ -75,11 +70,11 @@ bool ArcAssignment2::runAssignment2()
 
 	std::cout << "Printing Matrix 1" << '\n';
 
-	printMatrix(_ppMatrix1, _matrixSizeM, _matrixSizeN);
+	printMatrix(_pMatrix1, _matrixSizeM, _matrixSizeN);
 
 	std::cout << "Printing Matrix 2" << '\n';
 
-	printMatrix(_ppMatrix2, _matrixSizeN, _matrixSizeP);
+	printMatrix(_pMatrix2, _matrixSizeN, _matrixSizeP);
 
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -89,7 +84,7 @@ bool ArcAssignment2::runAssignment2()
 
 	std::cout << "Printing Matrix 3 - Generated From CPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
 
-	printMatrix(_ppMatrix3, _matrixSizeM, _matrixSizeP);
+	printMatrix(_pMatrix3, _matrixSizeM, _matrixSizeP);
 
 	begin = std::chrono::steady_clock::now();
 
@@ -99,83 +94,62 @@ bool ArcAssignment2::runAssignment2()
 
 	std::cout << "Printing Matrix 3 - Generated From GPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
 
-	printMatrix(_ppMatrix3, _matrixSizeM, _matrixSizeP);
+	printMatrix(_pMatrix3, _matrixSizeM, _matrixSizeP);
 
 	return true;
 }
 
 // Private Methods // 
 
-int ArcAssignment2::dotProduct(int** ppMatrix1, int** ppMatrix2, const int rowIndex, const int columnIndex, const int size)
+int ArcAssignment2::dotProduct(float* pMatrix1, float* pMatrix2, const int rowIndex, const int columnIndex, const int size)
 {
 	int runningTotal = 0;
 
 	for (int i = 0; i < size; ++i)
 	{
-		runningTotal += ppMatrix1[rowIndex][i] * ppMatrix2[i][columnIndex];
+		runningTotal += pMatrix1[rowIndex + CALC_COLUMN_OFFSET(i)] * pMatrix2[i + CALC_COLUMN_OFFSET(columnIndex)];
 	}
 
 	return runningTotal;
 }
 
-// TODO: FIX
-void ArcAssignment2::fillMatrix(int** ppMatrix, const int numberOfRows, const int numberOfColumns)
+void ArcAssignment2::fillMatrix(float* pMatrix, const int numberOfRows, const int numberOfColumns)
 {
 	srand(unsigned int(time(NULL)));
 
-	ppMatrix = new int*[numberOfRows];
-	for (int i = 0; i < numberOfRows; ++i)
+	for (int rowIndex = 0; rowIndex < numberOfRows; ++rowIndex)
 	{
-		ppMatrix[i] = new int[numberOfColumns];
-
-		for (int j = 0; j < numberOfColumns; ++j)
+		for (int columnIndex = 0; columnIndex < numberOfColumns; ++columnIndex)
 		{
-			ppMatrix[i][j] = rand() % 10;
+			pMatrix[rowIndex + CALC_COLUMN_OFFSET(columnIndex)] = CALC_RANDOM_FLOAT(rand(), MAX_ARRAY_VALUE, 0.0f);
 		}
 	}
 }
 
 void ArcAssignment2::generateMatrices()
 {
+	initializeSizes();
+	initializeMatrices();
+
+	fillMatrix(_pMatrix1, _matrixSizeM, _matrixSizeN);
+	fillMatrix(_pMatrix2, _matrixSizeN, _matrixSizeP);
+}
+
+void ArcAssignment2::initializeMatrices()
+{
+	_pMatrix3 = new float[_matrixSizeM * _matrixSizeP];
+	_pMatrix1 = new float[_matrixSizeM * _matrixSizeN];
+	_pMatrix2 = new float[_matrixSizeN * _matrixSizeP];
+}
+
+void ArcAssignment2::initializeSizes()
+{
 	srand(unsigned int(time(NULL)));
 
-	_matrixSizeM = rand() % MAX_ARRAY_SIZE + MIN_ARRAY_SIZE;
-	_matrixSizeN = rand() % MAX_ARRAY_SIZE + MIN_ARRAY_SIZE;
-	_matrixSizeP = rand() % MAX_ARRAY_SIZE + MIN_ARRAY_SIZE;
-	// Compiler (flat(rand()) / float(RAND_MAX)) * value_width + min_valut
-	
-
-	_ppMatrix1 = new int* [_matrixSizeM];
-	for (int i = 0; i < _matrixSizeM; ++i)
-	{
-		_ppMatrix1[i] = new int[_matrixSizeN];
-
-		for (int j = 0; j < _matrixSizeN; ++j)
-		{
-			_ppMatrix1[i][j] = rand() % MAX_ARRAY_VALUE;
-		}
-	}
-
-	_ppMatrix2 = new int* [_matrixSizeN];
-	for (int i = 0; i < _matrixSizeN; ++i)
-	{
-		_ppMatrix2[i] = new int[_matrixSizeP];
-
-		for (int j = 0; j < _matrixSizeP; ++j)
-		{
-			_ppMatrix2[i][j] = rand() % MAX_ARRAY_VALUE;
-		}
-	}
-
-	//fillMatricies(_ppMatrix1, _matrixSizeM, _matrixSizeN);
-	//fillMatricies(_ppMatrix2, _matrixSizeN, _matrixSizeP);
-
-	// Initialize the combination matrix
-	_ppMatrix3 = new int* [_matrixSizeM];
-	for (int i = 0; i < _matrixSizeM; ++i)
-	{
-		_ppMatrix3[i] = new int[_matrixSizeP];
-	}
+	_matrixSizeM = CALC_RANDOM_INT(rand(), MAX_ARRAY_SIZE, MIN_ARRAY_SIZE);
+	_matrixSizeN = CALC_RANDOM_INT(rand(), MAX_ARRAY_SIZE, MIN_ARRAY_SIZE);
+	_matrixSizeP = CALC_RANDOM_INT(rand(), MAX_ARRAY_SIZE, MIN_ARRAY_SIZE);
+	// Compiler (float(rand()) / float(RAND_MAX)) * value_width + min_value
 }
 
 void ArcAssignment2::multiplyMatricesCPU()
@@ -184,19 +158,19 @@ void ArcAssignment2::multiplyMatricesCPU()
 	{
 		for (int columnIndex = 0; columnIndex < _matrixSizeP; ++columnIndex)
 		{
-			_ppMatrix3[rowIndex][columnIndex] = dotProduct(_ppMatrix1, _ppMatrix2, rowIndex, columnIndex, _matrixSizeN);
+			_pMatrix3[rowIndex + CALC_COLUMN_OFFSET(columnIndex)] = dotProduct(_pMatrix1, _pMatrix2, rowIndex, columnIndex, _matrixSizeN);
 		}
 	}
 }
 
 bool ArcAssignment2::multiplyMatricesGPU()
 {
-	calcMatrixMultiply(_ppMatrix1, _ppMatrix2, _ppMatrix3, _matrixSizeM, _matrixSizeN, _matrixSizeP);
+	calcMatrixMultiply(_pMatrix1, _pMatrix2, _pMatrix3, _matrixSizeM, _matrixSizeN, _matrixSizeP);
 
 	return true;
 }
 
-void ArcAssignment2::printMatrix(int** ppMatrix, const int numberOfRows, const int numberOfColumns)
+void ArcAssignment2::printMatrix(float* pMatrix, const int numberOfRows, const int numberOfColumns)
 {
 	std::cout << OUTPUT_LINE;
 
@@ -204,7 +178,7 @@ void ArcAssignment2::printMatrix(int** ppMatrix, const int numberOfRows, const i
 	{
 		for (int columnIndex = 0; columnIndex < numberOfColumns; ++columnIndex)
 		{
-			std::cout << '|' << std::setfill(' ') << std::setw(4) << ppMatrix[rowIndex][columnIndex];
+			std::cout << '|' << std::setfill(' ') << std::setw(4) << pMatrix[rowIndex + CALC_COLUMN_OFFSET(columnIndex)];
 		}
 
 		std::cout << '\n';

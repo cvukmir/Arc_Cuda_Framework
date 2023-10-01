@@ -14,10 +14,11 @@
     <ProjectGuid>{47D8E101-3300-4AF2-BFAB-A7F8446704FF}</ProjectGuid>
     <RootNamespace>Cuda_Test_1</RootNamespace>
     <ProjectName>ArcCuda</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
@@ -84,16 +85,9 @@
     <CudaCompile Include="kernel.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ArcMain\ArcAssignment1.h" />
-    <ClInclude Include="..\ArcMain\ArcAssignment2.h" />
     <ClInclude Include="ArcCudaMatrixMultiply.h" />
     <ClInclude Include="ArcCudaDeviceProp.cuh" />
     <ClInclude Include="ArcCudaDeviceProp.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ArcMain\ArcAssignment1.cpp" />
-    <ClCompile Include="..\ArcMain\ArcAssignment2.cpp" />
-    <ClCompile Include="..\ArcMain\ArcMain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

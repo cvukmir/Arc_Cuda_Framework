@@ -9,11 +9,11 @@
 // Arc Cuda
 #include "ArcCudaMatrixMultiply.h"
 
-__global__ void matrixMultiply(int** ppMatrix1, int** ppMatrix2, int **ppMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
+__global__ void matrixMultiply(float* ppMatrix1, float* ppMatrix2, float* ppMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
 {
-    int tx = threadIdx.x;
-    int ty = threadIdx.y;
-    int Pvalue = 0;
+    //int tx = threadIdx.x;
+    //int ty = threadIdx.y;
+    //int Pvalue = 0;
 
     //int runningResult = 0;
     //for (int k = 0; k < Width; k++)
@@ -36,11 +36,11 @@ __global__ void matrixMultiply(int** ppMatrix1, int** ppMatrix2, int **ppMatrix3
     //ppMatrix3[tx][ty] = Pvalue;
 }
 
-bool calcMatrixMultiply(int** ppMatrix1, int** ppMatrix2, int** ppMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
+bool calcMatrixMultiply(float* ppMatrix1, float* ppMatrix2, float* ppMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
 {
-    int** ppCudaMatrix1;
-    int** ppCudaMatrix2;
-    int** ppCudaMatrix3;
+    float* ppCudaMatrix1;
+    float* ppCudaMatrix2;
+    float* ppCudaMatrix3;
 
     cudaError_t cudaStatus;
 

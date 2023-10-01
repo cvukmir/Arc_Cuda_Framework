@@ -28,3 +28,21 @@ m3[m][p]
 
 Matrix multiply:
 m3[m][p] = dotProduct(m1[m], (m2[n][p] for every n))
+
+
+Getting projects to link together:
+
+Linker -> Additional library directories:
+    - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\lib\x64
+    - C:\Users\Chris\source\repos\ArcCuda\x64\Debug
+
+Input -> Additional dependencies:
+    - cudart_static.lib
+
+C/C++ General -> Additional include directories:
+    - C:\Users\Chris\source\repos\ArcCuda\ArcCuda
+
+In C++ Project File:
+    - #pragma comment(lib, "ArcCuda.lib")
+
+In Cuda Project -> Properties -> General -> Configuration Type -> .exe -> .lib

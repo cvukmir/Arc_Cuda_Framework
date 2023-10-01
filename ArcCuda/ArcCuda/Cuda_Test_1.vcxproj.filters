@@ -21,12 +21,6 @@
     <ClInclude Include="ArcCudaMatrixMultiply.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\ArcMain\ArcAssignment1.h">
-      <Filter>Main Link</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ArcMain\ArcAssignment2.h">
-      <Filter>Main Link</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Cuda Header Files">
@@ -38,19 +32,5 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{8dffc27e-544e-4b1a-81ba-fc57293bd38c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main Link">
-      <UniqueIdentifier>{66addcf6-2c98-4d04-8ce5-2630b18cf0eb}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ArcMain\ArcAssignment1.cpp">
-      <Filter>Main Link</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ArcMain\ArcAssignment2.cpp">
-      <Filter>Main Link</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ArcMain\ArcMain.cpp">
-      <Filter>Main Link</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
