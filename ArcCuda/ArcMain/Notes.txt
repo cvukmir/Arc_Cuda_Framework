@@ -1,0 +1,30 @@
+Matrix Multiplication:
+
+x[row][col] - Row Major Order for ALL Matricies.
+___________
+m1[m][n]
+m2[n][p]
+m3[m][p]
+                                 p
+                       _______________________
+                        |                   |
+                        |                   |
+                        |                   |
+                     n  |     m2 = nxp      | n
+                        |                   |
+                        |                   |
+             n          |                   |
+   _____________________|___________________|_
+    |                   |                   |
+    |                   |                   |
+    |                   |                   |
+    |                   |                   |
+  m |     m1 = mxn      |     m3 = mxp      | m
+    |                   |                   |
+    |                   |                   |
+    |                   |                   |
+   _|___________________|___________________|_
+    |        n          |        p          |
+
+Matrix multiply:
+m3[m][p] = dotProduct(m1[m], (m2[n][p] for every n))

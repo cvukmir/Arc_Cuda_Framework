@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="ArcCudaMatrixMultiply.cu">
+      <Filter>Cuda Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="ArcCudaDeviceProp.cu">
+      <Filter>Cuda Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="kernel.cu">
+      <Filter>Cuda Source Files</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ArcCudaDeviceProp.cuh">
+      <Filter>Cuda Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArcCudaDeviceProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArcCudaMatrixMultiply.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ArcMain\ArcAssignment1.h">
+      <Filter>Main Link</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ArcMain\ArcAssignment2.h">
+      <Filter>Main Link</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Cuda Header Files">
+      <UniqueIdentifier>{8fb0f7af-c4bb-49f8-94fa-fce8b0bcce65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cuda Source Files">
+      <UniqueIdentifier>{6040f4c3-3ce2-4c46-a380-8d11e0948e8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{8dffc27e-544e-4b1a-81ba-fc57293bd38c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Link">
+      <UniqueIdentifier>{66addcf6-2c98-4d04-8ce5-2630b18cf0eb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ArcMain\ArcAssignment1.cpp">
+      <Filter>Main Link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ArcMain\ArcAssignment2.cpp">
+      <Filter>Main Link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ArcMain\ArcMain.cpp">
+      <Filter>Main Link</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

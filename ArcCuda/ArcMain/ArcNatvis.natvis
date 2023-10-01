@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Concurrency::array&lt;*,*&gt;">
+		<DisplayString>extent = {_M_extent}</DisplayString>
+		<Expand>
+			<Item Name="extent">_M_extent</Item>
+			<ArrayItems Condition="_M_buffer_descriptor._M_data_ptr != 0">
+				<Direction>Forward</Direction>
+				<Rank>$T2</Rank>
+				<Size>_M_extent._M_base[$i]</Size>
+				<ValuePointer>($T1*) _M_buffer_descriptor._M_data_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+</AutoVisualizer>
