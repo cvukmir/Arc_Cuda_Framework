@@ -9,40 +9,31 @@
 // Arc Cuda
 #include "ArcCudaMatrixMultiply.h"
 
-__global__ void matrixMultiply(float* ppMatrix1, float* ppMatrix2, float* ppMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
+__global__ void matrixMultiply(float* pMatrix1, float* pMatrix2, float* pMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
 {
-    //int tx = threadIdx.x;
-    //int ty = threadIdx.y;
-    //int Pvalue = 0;
+    int   threadX = threadIdx.x;
+    int   threadY = threadIdx.y;
+    float Pvalue  = 0.0f;
 
-    //int runningResult = 0;
-    //for (int k = 0; k < Width; k++)
-    //{
-    //    float Mdelement = Md[ty * Width + k];
-    //    float Ndelement = Nd[k * Width + tx];
-    //    // Pd[ty*Width+tx] += Mdelement * Ndelement; – NO!
-    //    runningResult += Mdelement * Ndelement;
-    //}
-    //
-    //Pd[ty * Width + tx] = runningResult;
+    for (int k = 0; k < matrixSizeM; ++k)
+    {
+        float Mdelement = pMatrix1[threadY * matrixSizeM + k];
+        float Ndelement = pMatrix2[k * matrixSizeM + threadX];
+        Pvalue += Mdelement * Ndelement;
+    }
 
-    //for (int rowIndex = 0; rowIndex < matrixSizeM; ++rowIndex)
-    //{
-    //    for (int columnIndex = 0; columnIndex < matrixSizeP; ++columnIndex)
-    //    {
-    //        _ppMatrix3[rowIndex][columnIndex] = dotProduct(_ppMatrix1, _ppMatrix2, rowIndex, columnIndex, _matrixSizeN);
-    //    }
-    //}
-    //ppMatrix3[tx][ty] = Pvalue;
+    pMatrix3[threadY * matrixSizeM + threadX] = Pvalue;
 }
 
-bool calcMatrixMultiply(float* ppMatrix1, float* ppMatrix2, float* ppMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
+bool calcMatrixMultiply(float* pMatrix1, float* pMatrix2, float* pMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
 {
-    float* ppCudaMatrix1;
-    float* ppCudaMatrix2;
-    float* ppCudaMatrix3;
+    float* pCudaMatrix1;
+    float* pCudaMatrix2;
+    float* pCudaMatrix3;
 
     cudaError_t cudaStatus;
+
+    // Set the device //
 
     cudaStatus = cudaSetDevice(0);
     if (cudaStatus != cudaSuccess) 
@@ -51,73 +42,98 @@ bool calcMatrixMultiply(float* ppMatrix1, float* ppMatrix2, float* ppMatrix3, co
         return false;
     }
 
-    cudaStatus = cudaMalloc((void**)&ppCudaMatrix1, size_t(matrixSizeM) * size_t(matrixSizeN) * sizeof(int));
+    // Allocate the arrays //
+
+    cudaStatus = cudaMalloc((void**)&pCudaMatrix1, size_t(matrixSizeM) * size_t(matrixSizeN) * sizeof(float));
     if (cudaStatus != cudaSuccess)
     {
         std::cout << "Could not allocate the first Cuda Matrix.\n";
         return false;
     }
 
-    cudaStatus = cudaMalloc((void**)&ppCudaMatrix2, size_t(matrixSizeN) * size_t(matrixSizeP) * sizeof(int));
+    cudaStatus = cudaMalloc((void**)&pCudaMatrix2, size_t(matrixSizeN) * size_t(matrixSizeP) * sizeof(float));
     if (cudaStatus != cudaSuccess)
     {
+        cudaFree(pCudaMatrix1);
         std::cout << "Could not allocate the second Cuda Matrix.\n";
         return false;
     }
 
-    cudaStatus = cudaMalloc((void**)&ppCudaMatrix3, size_t(matrixSizeM) * size_t(matrixSizeP) * sizeof(int));
+    cudaStatus = cudaMalloc((void**)&pCudaMatrix3, size_t(matrixSizeM) * size_t(matrixSizeP) * sizeof(float));
     if (cudaStatus != cudaSuccess)
     {
+        cudaFree(pCudaMatrix1);
+        cudaFree(pCudaMatrix2);
         std::cout << "Could not allocate the third Cuda Matrix.\n";
         return false;
     }
 
-    cudaStatus = cudaMemcpy(ppCudaMatrix1, ppMatrix1, size_t(matrixSizeM) * size_t(matrixSizeN) * sizeof(int), cudaMemcpyHostToDevice);
+    // Copy the memory from CPU to GPU //
+
+    cudaStatus = cudaMemcpy(pCudaMatrix1, pMatrix1, size_t(matrixSizeM) * size_t(matrixSizeN) * sizeof(float), cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) 
     {
+        cudaFree(pCudaMatrix1);
+        cudaFree(pCudaMatrix2);
+        cudaFree(pCudaMatrix3);
         std::cout << "Could not copy the memory from the host first matrix to the device first Matrix.\n";
         return false;
     }
 
-    cudaStatus = cudaMemcpy(ppCudaMatrix2, ppMatrix2, size_t(matrixSizeN) * size_t(matrixSizeP) * sizeof(int), cudaMemcpyHostToDevice);
+    cudaStatus = cudaMemcpy(pCudaMatrix2, pMatrix2, size_t(matrixSizeN) * size_t(matrixSizeP) * sizeof(float), cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess)
     {
+        cudaFree(pCudaMatrix1);
+        cudaFree(pCudaMatrix2);
+        cudaFree(pCudaMatrix3);
         std::cout << "Could not copy the memory from the host second matrix to the device second Matrix.\n";
         return false;
     }
 
+    // Perform the multiplication //
+
     dim3 blockSize(matrixSizeN, matrixSizeN);
     dim3 gridSize(1, 1);
 
-    matrixMultiply<<<gridSize, blockSize>>>(ppMatrix1, ppMatrix2, ppMatrix3, matrixSizeM, matrixSizeN, matrixSizeP);
+    matrixMultiply<<<gridSize, blockSize>>>(pCudaMatrix1, pCudaMatrix2, pCudaMatrix3, matrixSizeM, matrixSizeN, matrixSizeP);
 
     cudaStatus = cudaGetLastError();
     if (cudaStatus != cudaSuccess) 
     {
+        cudaFree(pCudaMatrix1);
+        cudaFree(pCudaMatrix2);
+        cudaFree(pCudaMatrix3);
         std::cout << "Error processing Cuda matrix multiplication.\n";
         return false;
     }
 
-    // cudaDeviceSynchronize waits for the kernel to finish, and returns
-    // any errors encountered during the launch.
+    // Synchronize threads //
+
     cudaStatus = cudaDeviceSynchronize();
     if (cudaStatus != cudaSuccess) 
     {
+        cudaFree(pCudaMatrix1);
+        cudaFree(pCudaMatrix2);
+        cudaFree(pCudaMatrix3);
         std::cout << "Error processing synchronizing Cuda kernel threads.\n";
         return false;
     }
 
-    // Copy output vector from GPU buffer to host memory.
-    cudaStatus = cudaMemcpy(ppCudaMatrix3, ppMatrix3, size_t(matrixSizeM) * size_t(matrixSizeP) * sizeof(int), cudaMemcpyDeviceToHost);
+    // Copy the memory from the GPU to the CPU //
+    
+    cudaStatus = cudaMemcpy(pMatrix3, pCudaMatrix3, size_t(matrixSizeM) * size_t(matrixSizeP) * sizeof(float), cudaMemcpyDeviceToHost);
     if (cudaStatus != cudaSuccess) 
     {
+        cudaFree(pCudaMatrix1);
+        cudaFree(pCudaMatrix2);
+        cudaFree(pCudaMatrix3);
         std::cout << "Could not copy the memory from the device third matrix to the host third matrix.\n";
         return false;
     }
 
-    cudaFree(ppCudaMatrix1);
-    cudaFree(ppCudaMatrix2);
-    cudaFree(ppCudaMatrix3);
+    cudaFree(pCudaMatrix1);
+    cudaFree(pCudaMatrix2);
+    cudaFree(pCudaMatrix3);
 
     return true;
 }

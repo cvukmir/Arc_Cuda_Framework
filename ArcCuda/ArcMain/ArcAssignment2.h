@@ -20,7 +20,7 @@ private:
 	// Private Methods //
 
 	// Calculates the dot product from the two matricies at the row index of the first matrix and column index of the second for the given size.
-	int dotProduct(float* ppMatrix1, float* ppMatrix, const int rowIndex, const int columnIndex, const int size);
+	float dotProduct(float* ppMatrix1, float* ppMatrix, const int rowIndex, const int columnIndex, const int size);
 
 	// Fills the matrix with random values of the specified number of rows and columns.
 	void fillMatrix(float* ppMatrix, const int numberOfRows, const int numberOfColumns);
