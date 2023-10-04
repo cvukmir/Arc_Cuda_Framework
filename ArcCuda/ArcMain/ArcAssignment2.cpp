@@ -92,7 +92,7 @@ bool ArcAssignment2::runAssignment2()
 	{
 		for (int columnIndex = 0; columnIndex < _matrixSizeP; ++columnIndex)
 		{
-			_pMatrix3[rowIndex + CALC_COLUMN_OFFSET(columnIndex)] = 0.0;
+			_pMatrix3[rowIndex * _matrixSizeP + columnIndex] = 0.0;
 		}
 	}
 
@@ -118,7 +118,7 @@ float ArcAssignment2::dotProduct(float* pMatrix1, float* pMatrix2, const int row
 
 	for (int i = 0; i < size; ++i)
 	{
-		runningTotal += pMatrix1[rowIndex + CALC_COLUMN_OFFSET(i)] * pMatrix2[i + CALC_COLUMN_OFFSET(columnIndex)];
+		runningTotal += pMatrix1[rowIndex * size + i] * pMatrix2[i * size + columnIndex];
 	}
 
 	return runningTotal;
@@ -128,11 +128,13 @@ void ArcAssignment2::fillMatrix(float* pMatrix, const int numberOfRows, const in
 {
 	srand(unsigned int(time(NULL)));
 
+	// Change this to a single loop based on pointers.
+
 	for (int rowIndex = 0; rowIndex < numberOfRows; ++rowIndex)
 	{
 		for (int columnIndex = 0; columnIndex < numberOfColumns; ++columnIndex)
 		{
-			pMatrix[rowIndex + CALC_COLUMN_OFFSET(columnIndex)] = CALC_RANDOM_FLOAT(rand(), MAX_ARRAY_VALUE, 0.0f);
+			pMatrix[rowIndex * numberOfColumns + columnIndex] = (rand() / static_cast<float>(RAND_MAX)) * MAX_ARRAY_VALUE;
 		}
 	}
 }
@@ -141,6 +143,22 @@ void ArcAssignment2::generateMatrices()
 {
 	initializeSizes();
 	initializeMatrices();
+
+	for (int rowIndex = 0; rowIndex < _matrixSizeM; ++rowIndex)
+	{
+		for (int columnIndex = 0; columnIndex < _matrixSizeN; ++columnIndex)
+		{
+			_pMatrix1[rowIndex * _matrixSizeN + columnIndex] = 0.0;
+		}
+	}
+	
+	for (int rowIndex = 0; rowIndex < _matrixSizeN; ++rowIndex)
+	{
+		for (int columnIndex = 0; columnIndex < _matrixSizeP; ++columnIndex)
+		{
+			_pMatrix2[rowIndex * _matrixSizeP + columnIndex] = 0.0;
+		}
+	}
 
 	fillMatrix(_pMatrix1, _matrixSizeM, _matrixSizeN);
 	fillMatrix(_pMatrix2, _matrixSizeN, _matrixSizeP);
@@ -168,7 +186,7 @@ void ArcAssignment2::multiplyMatricesCPU()
 	{
 		for (int columnIndex = 0; columnIndex < _matrixSizeP; ++columnIndex)
 		{
-			_pMatrix3[rowIndex + CALC_COLUMN_OFFSET(columnIndex)] = dotProduct(_pMatrix1, _pMatrix2, rowIndex, columnIndex, _matrixSizeN);
+			_pMatrix3[rowIndex * _matrixSizeP + columnIndex] = dotProduct(_pMatrix1, _pMatrix2, rowIndex, columnIndex, _matrixSizeN);
 		}
 	}
 }
@@ -186,7 +204,7 @@ void ArcAssignment2::printMatrix(float* pMatrix, const int numberOfRows, const i
 	{
 		for (int columnIndex = 0; columnIndex < numberOfColumns; ++columnIndex)
 		{
-			std::cout << '|' << std::setfill(' ') << std::setw(4) << std::setprecision(7) << pMatrix[rowIndex + CALC_COLUMN_OFFSET(columnIndex)];
+			std::cout << '|' << std::setfill(' ') << std::setw(4) << std::setprecision(7) << pMatrix[rowIndex * numberOfColumns + columnIndex];
 		}
 
 		std::cout << '\n';

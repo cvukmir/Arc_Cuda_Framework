@@ -11,18 +11,22 @@
 
 __global__ void matrixMultiply(float* pMatrix1, float* pMatrix2, float* pMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
 {
-    int   threadX = threadIdx.x;
-    int   threadY = threadIdx.y;
-    float Pvalue  = 0.0f;
+    // 1. Change block size
+    // 2. Non-square
+    // 3. Tiled
+    // 4. Shared memory
+    int   threadX       = threadIdx.x;
+    int   threadY       = threadIdx.y;
+    float computedValue = 0.0f;
 
     for (int k = 0; k < matrixSizeM; ++k)
     {
-        float Mdelement = pMatrix1[threadY * matrixSizeM + k];
-        float Ndelement = pMatrix2[k * matrixSizeM + threadX];
-        Pvalue += Mdelement * Ndelement;
+        float matrix1Element = pMatrix1[threadY * matrixSizeM + k];
+        float matrix2Element = pMatrix2[k * matrixSizeM + threadX];
+        computedValue += matrix1Element * matrix2Element;
     }
 
-    pMatrix3[threadY * matrixSizeM + threadX] = Pvalue;
+    pMatrix3[threadY * matrixSizeM + threadX] = computedValue;
 }
 
 bool calcMatrixMultiply(float* pMatrix1, float* pMatrix2, float* pMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
@@ -104,18 +108,6 @@ bool calcMatrixMultiply(float* pMatrix1, float* pMatrix2, float* pMatrix3, const
         cudaFree(pCudaMatrix2);
         cudaFree(pCudaMatrix3);
         std::cout << "Error processing Cuda matrix multiplication.\n";
-        return false;
-    }
-
-    // Synchronize threads //
-
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess) 
-    {
-        cudaFree(pCudaMatrix1);
-        cudaFree(pCudaMatrix2);
-        cudaFree(pCudaMatrix3);
-        std::cout << "Error processing synchronizing Cuda kernel threads.\n";
         return false;
     }
 
