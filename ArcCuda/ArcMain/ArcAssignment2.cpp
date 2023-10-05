@@ -118,7 +118,9 @@ float ArcAssignment2::dotProduct(float* pMatrix1, float* pMatrix2, const int row
 
 	for (int i = 0; i < size; ++i)
 	{
-		runningTotal += pMatrix1[rowIndex * size + i] * pMatrix2[i * size + columnIndex];
+		float val1 = pMatrix1[rowIndex * size + i];
+		float val2 = pMatrix2[i * _matrixSizeP + columnIndex];pMatrix2[i * size + columnIndex];
+		runningTotal += val1 * val2;
 	}
 
 	return runningTotal;
@@ -175,9 +177,9 @@ void ArcAssignment2::initializeSizes()
 {
 	srand(unsigned int(time(NULL)));
 
-	_matrixSizeM = TEST_SIZE;
-	_matrixSizeN = TEST_SIZE;
-	_matrixSizeP = TEST_SIZE;
+	_matrixSizeM = static_cast<int>(rand() % 100 + 3);
+	_matrixSizeN = static_cast<int>(rand() % 100 + 3);
+	_matrixSizeP = static_cast<int>(rand() % 100 + 3);
 }
 
 void ArcAssignment2::multiplyMatricesCPU()
