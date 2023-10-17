@@ -4,21 +4,26 @@
 class ArcAssignment2
 {
 public:
-
-	// Constructors //
+	// Constructor(s) //
 
 	ArcAssignment2();
+	
+public:
+	// Destructor(s) //
+
 	~ArcAssignment2();
 
-	// Public Methods //
+public:
+	// Methods - Public //
 
 	// Executes the methods need for assignment 2.
 	bool runAssignment2();
 
 private:
 
-	// Private Methods //
+	// Methods - Private //
 
+	// Zeros the given matrix that has the given sizes.
 	void clearMatrix(float* pMatrix, const int rowSize, const int columnSize);
 
 	// Calculates the dot product from the two matricies at the row index of the first matrix and column index of the second for the given size.
@@ -45,7 +50,8 @@ private:
 	// Prints the given matrix with its specified number of rows and columns.
 	void printMatrix(float* pMatrix, const int numberOfRows, const int numberOfColumns);
 
-	// Private Variables //
+private:
+	// Variables - Private //
 
 	float* _pMatrix1;    // This objects first  matrix.
 	float* _pMatrix2;    // This objects second matrix.

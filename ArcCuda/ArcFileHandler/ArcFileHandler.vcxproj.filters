@@ -18,9 +18,21 @@
     <ClCompile Include="ArcFileAction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ArcFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ArcMatrix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArcFileAction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArcFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArcMatrix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

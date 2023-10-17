@@ -5,6 +5,9 @@
 #include <string>
 #include <chrono>
 
+// Arc File Handler
+#include "ArcMatrix.hpp"
+
 // ArcMain
 #include "ArcAssignment2.h"
 
@@ -21,9 +24,9 @@ const int         MAX_ARRAY_VALUE = 100.0f;
 const int         TEST_SIZE       = 32;
 const size_t      FLOAT_SIZE      = sizeof(float);
 
-#define CALC_COLUMN_OFFSET(column) (FLOAT_SIZE * column)
-#define CALC_RANDOM_FLOAT(randNum, max, min) (min + (static_cast<float>(randNum) / static_cast<float>(RAND_MAX / (max - min)))) // ??? (float(rand()) / float(RAND_MAX)) * value_width + min_value
-#define CALC_RANDOM_INT(randNum, max, min) (randNum % max + min)
+//#define CALC_COLUMN_OFFSET(column) (FLOAT_SIZE * column)
+//#define CALC_RANDOM_FLOAT(randNum, max, min) (min + (static_cast<float>(randNum) / static_cast<float>(RAND_MAX / (max - min)))) // ??? (float(rand()) / float(RAND_MAX)) * value_width + min_value
+//#define CALC_RANDOM_INT(randNum, max, min) (randNum % max + min)
 
 // Constructors //
 
@@ -159,9 +162,9 @@ void ArcAssignment2::initializeSizes()
 {
 	srand(unsigned int(time(NULL)));
 
-	_matrixSizeM = static_cast<int>(rand() % 100 + 3);
-	_matrixSizeN = static_cast<int>(rand() % 100 + 3);
-	_matrixSizeP = static_cast<int>(rand() % 100 + 3);
+	_matrixSizeM = 85;//static_cast<int>(rand() % 100 + 3);
+	_matrixSizeN = 3;//static_cast<int>(rand() % 100 + 3);
+	_matrixSizeP = 60;//static_cast<int>(rand() % 100 + 3);
 }
 
 void ArcAssignment2::multiplyMatricesCPU()

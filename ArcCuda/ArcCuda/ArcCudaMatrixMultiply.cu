@@ -66,6 +66,11 @@ __global__ void matrixMultiplyDynamicShared(float* pMatrix1, float* pMatrix2, fl
 
 	for (int blockIndex = 0; blockIndex <= matrixSizeN / BLOCK_WIDTH; ++blockIndex) 
 	{
+		if (blockX == 0 && blockY == 1 && threadX == 0 && threadY == 0)
+		{
+			blockY = 1;
+		}
+
 		// Approach1: Add in a check for wrap around
 
 		// Loop over blocks
@@ -74,36 +79,44 @@ __global__ void matrixMultiplyDynamicShared(float* pMatrix1, float* pMatrix2, fl
 
 		__syncthreads();
 
-		for (int k = 0; k < BLOCK_WIDTH; ++k) 
+		if (!(row >= matrixSizeM || col >= matrixSizeP))
 		{
-			float m1 = 0.0;
-			float m2 = 0.0;
-
-			int extraWidth = matrixSizeN - (blockIndex * BLOCK_WIDTH);
-
-			// Approach2: Check for out of bounds here.
-			if (k % BLOCK_WIDTH < extraWidth)
+			for (int k = 0; k < BLOCK_WIDTH; ++k)
 			{
-				m1 = matrix1Shared[threadY][k];
-			}
+				float m1 = 0.0;
+				float m2 = 0.0;
 
-			if (k < extraWidth)
-			{
-				m2 = matrix2Shared[k][threadX];
+				int extraWidth = matrixSizeN - (blockIndex * BLOCK_WIDTH);
+
+				// Approach2: Check for out of bounds here.
+				if (k % BLOCK_WIDTH < extraWidth)
+				{
+					m1 = matrix1Shared[threadY][k];
+				}
+
+				if (k < extraWidth)
+				{
+					m2 = matrix2Shared[k][threadX];
+				}
+
+				computedValue += m1 * m2;
 			}
-			
-			computedValue += m1 * m2;
 		}
 
 		__syncthreads(); 
 	}
-
-	if (row >= matrixSizeM || col >= matrixSizeP)
-	{
-		return;
-	}
+//	if (blockX == 0 && blockY == 1 && threadX == 0 && threadY == 0)
+//	{
+//		printf("\n\n%f\n", computedValue);
+//	}
+	float test = pMatrix3[33 * matrixSizeP + 0];
 
 	pMatrix3[row * matrixSizeP + col] = computedValue; // Changed to matrixSizeP from width (matrixSizeN)
+
+	if (pMatrix3[33 * matrixSizeP + 0] != test)
+	{
+		printf("\n%f array: %f - blockx: %d block y: %d row: %d col: %d threadx: %d threadY: %d\n", test, pMatrix3[33 * matrixSizeP + 0], blockX, blockY, row, col, threadX, threadY);
+	}
 }
 
 __global__ void matrixMultiplyDynamic(float* pMatrix1, float* pMatrix2, float* pMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
