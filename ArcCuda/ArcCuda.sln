@@ -6,6 +6,11 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArcCuda", "ArcCuda\Cuda_Test_1.vcxproj", "{47D8E101-3300-4AF2-BFAB-A7F8446704FF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArcMain", "ArcMain\Main.vcxproj", "{10EFF0D6-A8C2-4A2A-8E84-7D43C6E03CB7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE} = {4899FAE4-63BC-4C80-8223-35BAA036C6EE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArcFileHandler", "ArcFileHandler\ArcFileHandler.vcxproj", "{4899FAE4-63BC-4C80-8223-35BAA036C6EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +36,14 @@ Global
 		{10EFF0D6-A8C2-4A2A-8E84-7D43C6E03CB7}.Release|x64.Build.0 = Release|x64
 		{10EFF0D6-A8C2-4A2A-8E84-7D43C6E03CB7}.Release|x86.ActiveCfg = Release|Win32
 		{10EFF0D6-A8C2-4A2A-8E84-7D43C6E03CB7}.Release|x86.Build.0 = Release|Win32
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Debug|x64.ActiveCfg = Debug|x64
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Debug|x64.Build.0 = Debug|x64
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Debug|x86.ActiveCfg = Debug|Win32
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Debug|x86.Build.0 = Debug|Win32
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Release|x64.ActiveCfg = Release|x64
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Release|x64.Build.0 = Release|x64
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Release|x86.ActiveCfg = Release|Win32
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

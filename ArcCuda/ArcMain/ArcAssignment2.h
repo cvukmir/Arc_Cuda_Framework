@@ -19,17 +19,21 @@ private:
 
 	// Private Methods //
 
+	void clearMatrix(float* pMatrix, const int rowSize, const int columnSize);
+
 	// Calculates the dot product from the two matricies at the row index of the first matrix and column index of the second for the given size.
-	float dotProduct(float* ppMatrix1, float* ppMatrix, const int rowIndex, const int columnIndex, const int size);
+	float dotProduct(float* pMatrix1, float* pMatrix, const int rowIndex, const int columnIndex, const int size);
 
 	// Fills the matrix with random values of the specified number of rows and columns.
-	void fillMatrix(float* ppMatrix, const int numberOfRows, const int numberOfColumns);
+	void fillMatrix(float* pMatrix, const int numberOfRows, const int numberOfColumns);
 
 	// Generates this objects three matricies.
 	void generateMatrices();
 
+	// Initializes the class matricies to the sizes needed for matrix multiplication.
 	void initializeMatrices();
 
+	// Initializes the class matricies sizes to random sizes.
 	void initializeSizes();
 
 	// Preforms matrix multiplication on this objects three matricies using the CPU.
@@ -39,7 +43,7 @@ private:
 	bool multiplyMatricesGPU();
 
 	// Prints the given matrix with its specified number of rows and columns.
-	void printMatrix(float* ppMatrix, const int numberOfRows, const int numberOfColumns);
+	void printMatrix(float* pMatrix, const int numberOfRows, const int numberOfColumns);
 
 	// Private Variables //
 

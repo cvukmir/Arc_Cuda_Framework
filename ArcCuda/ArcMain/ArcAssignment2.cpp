@@ -60,6 +60,18 @@ ArcAssignment2::~ArcAssignment2()
 
 // Public Methods //
 
+void ArcAssignment2::clearMatrix(float* pMatrix, const int rowSize, const int columnSize)
+{
+	// TODO: Turn this into pointers.
+	for (int rowIndex = 0; rowIndex < rowSize; ++rowIndex)
+	{
+		for (int columnIndex = 0; columnIndex < columnSize; ++columnIndex)
+		{
+			pMatrix[rowIndex * columnSize + columnIndex] = 0.0;
+		}
+	}
+}
+
 bool ArcAssignment2::runAssignment2()
 {
 	generateMatrices();
@@ -76,34 +88,16 @@ bool ArcAssignment2::runAssignment2()
 
 	printMatrix(_pMatrix2, _matrixSizeN, _matrixSizeP);
 
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
 	multiplyMatricesCPU();
-
-	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-	std::cout << "Printing Matrix 3 - Generated From CPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
 
 	printMatrix(_pMatrix3, _matrixSizeM, _matrixSizeP);
 
-	begin = std::chrono::steady_clock::now();
-
-	for (int rowIndex = 0; rowIndex < _matrixSizeM; ++rowIndex)
-	{
-		for (int columnIndex = 0; columnIndex < _matrixSizeP; ++columnIndex)
-		{
-			_pMatrix3[rowIndex * _matrixSizeP + columnIndex] = 0.0;
-		}
-	}
+	clearMatrix(_pMatrix3, _matrixSizeM, _matrixSizeP);
 
 	if (!multiplyMatricesGPU())
 	{
 		return false;
 	}
-
-	end = std::chrono::steady_clock::now();
-
-	std::cout << "Printing Matrix 3 - Generated From GPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
 
 	printMatrix(_pMatrix3, _matrixSizeM, _matrixSizeP);
 
@@ -146,21 +140,9 @@ void ArcAssignment2::generateMatrices()
 	initializeSizes();
 	initializeMatrices();
 
-	for (int rowIndex = 0; rowIndex < _matrixSizeM; ++rowIndex)
-	{
-		for (int columnIndex = 0; columnIndex < _matrixSizeN; ++columnIndex)
-		{
-			_pMatrix1[rowIndex * _matrixSizeN + columnIndex] = 0.0;
-		}
-	}
-	
-	for (int rowIndex = 0; rowIndex < _matrixSizeN; ++rowIndex)
-	{
-		for (int columnIndex = 0; columnIndex < _matrixSizeP; ++columnIndex)
-		{
-			_pMatrix2[rowIndex * _matrixSizeP + columnIndex] = 0.0;
-		}
-	}
+	clearMatrix(_pMatrix1, _matrixSizeM, _matrixSizeN);
+	clearMatrix(_pMatrix2, _matrixSizeN, _matrixSizeP);
+	clearMatrix(_pMatrix3, _matrixSizeM, _matrixSizeP);
 
 	fillMatrix(_pMatrix1, _matrixSizeM, _matrixSizeN);
 	fillMatrix(_pMatrix2, _matrixSizeN, _matrixSizeP);
@@ -184,6 +166,8 @@ void ArcAssignment2::initializeSizes()
 
 void ArcAssignment2::multiplyMatricesCPU()
 {
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 	for (int rowIndex = 0; rowIndex < _matrixSizeM; ++rowIndex)
 	{
 		for (int columnIndex = 0; columnIndex < _matrixSizeP; ++columnIndex)
@@ -191,6 +175,10 @@ void ArcAssignment2::multiplyMatricesCPU()
 			_pMatrix3[rowIndex * _matrixSizeP + columnIndex] = dotProduct(_pMatrix1, _pMatrix2, rowIndex, columnIndex, _matrixSizeN);
 		}
 	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+	std::cout << "Printing Matrix 3 - Generated From CPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
 }
 
 bool ArcAssignment2::multiplyMatricesGPU()
