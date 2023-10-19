@@ -1,7 +1,8 @@
+// ArcCuda
 #include "ArcCudaDeviceprop.cuh"
 
+// Std C++
 #include <cinttypes>
-
 #include <iomanip>
 #include <iostream>
 

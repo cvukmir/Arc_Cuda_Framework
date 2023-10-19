@@ -9,46 +9,11 @@
 #include <stdint.h>
 #include <chrono>
 
-
-// Arc Cuda
+// ArcCuda
 #include "ArcCudaMatrixMultiply.h"
 
+
 const int BLOCK_WIDTH = 32; // AKA: TILE_WIDTH
-
-__global__ void MatMul(float* A, float* B, float* C, int ARows, int ACols, int BRows, int BCols, int CRows, int CCols)
-{
-	float CValue = 0;
-
-	int Row = blockIdx.y * BLOCK_WIDTH + threadIdx.y;
-	int Col = blockIdx.x * BLOCK_WIDTH + threadIdx.x;
-
-	__shared__ float As[BLOCK_WIDTH][BLOCK_WIDTH];
-	__shared__ float Bs[BLOCK_WIDTH][BLOCK_WIDTH];
-
-	for (int k = 0; k < (BLOCK_WIDTH + ACols - 1) / BLOCK_WIDTH; k++) {
-
-		if (k * BLOCK_WIDTH + threadIdx.x < ACols && Row < ARows)
-			As[threadIdx.y][threadIdx.x] = A[Row * ACols + k * BLOCK_WIDTH + threadIdx.x];
-		else
-			As[threadIdx.y][threadIdx.x] = 0.0;
-
-		if (k * BLOCK_WIDTH + threadIdx.y < BRows && Col < BCols)
-			Bs[threadIdx.y][threadIdx.x] = B[(k * BLOCK_WIDTH + threadIdx.y) * BCols + Col];
-		else
-			Bs[threadIdx.y][threadIdx.x] = 0.0;
-
-		__syncthreads();
-
-		for (int n = 0; n < BLOCK_WIDTH; ++n)
-			CValue += As[threadIdx.y][n] * Bs[n][threadIdx.x];
-
-		__syncthreads();
-	}
-
-	if (Row < CRows && Col < CCols)
-		C[((blockIdx.y * blockDim.y + threadIdx.y) * CCols) +
-		(blockIdx.x * blockDim.x) + threadIdx.x] = CValue;
-}
 
 __global__ void matrixMultiplyDynamicShared(float* pMatrix1, float* pMatrix2, float* pMatrix3, const int matrixSizeM, const int matrixSizeN, const int matrixSizeP)
 {

@@ -40,4 +40,6 @@ bool ArcFileAction::readFile(const std::string& fileName)
 
 	fileStream.flush();
 	fileStream.close();
+
+	return true;
 }

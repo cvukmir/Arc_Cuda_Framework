@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARC_CUDA_DEVICE_PROP_H
+#define ARC_CUDA_DEVICE_PROP_H
 
 #include <string>
 
@@ -15,3 +16,4 @@ private:
 	// Methods
 	void printField(std::string outputStringName, std::string outputStringValue);
 };
+#endif // !ARC_CUDA_DEVICE_PROP_H

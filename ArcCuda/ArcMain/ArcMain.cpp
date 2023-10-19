@@ -1,20 +1,20 @@
-#include "ArcAssignment1.h"
-#include "ArcAssignment2.h"
+// ArcMain
+#include "ArcMatrixMultiply.h"
+#include "ArcNormalization.h"
 
-
-// C:\Users\Chris\source\repos\Cuda_Test_1
-//#include "C:\Users\Chris\source\repos\Cuda_Test_1\"
 
 int main()
 {
-	if (!ArcAssignment1::runAssignment1())
-	{
-		return -1;
-	}
+//	ArcMatrixMultiply matrixMultiply;
 
-	ArcAssignment2 Assign2;
+//	if (!matrixMultiply.performMatrixMultiplication())
+//	{
+//		return -1;
+//	}
 
-	if (!Assign2.runAssignment2())
+	ArcNormalization normalizer;
+
+	if (!normalizer.performNormalization())
 	{
 		return -1;
 	}

@@ -7,10 +7,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArcCuda", "ArcCuda\Cuda_Tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArcMain", "ArcMain\Main.vcxproj", "{10EFF0D6-A8C2-4A2A-8E84-7D43C6E03CB7}"
 	ProjectSection(ProjectDependencies) = postProject
+		{32B26593-0254-4D0A-8859-B31E22112ABB} = {32B26593-0254-4D0A-8859-B31E22112ABB}
 		{4899FAE4-63BC-4C80-8223-35BAA036C6EE} = {4899FAE4-63BC-4C80-8223-35BAA036C6EE}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArcFileHandler", "ArcFileHandler\ArcFileHandler.vcxproj", "{4899FAE4-63BC-4C80-8223-35BAA036C6EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{E1104024-EA9A-4137-BA63-2534A82FFCF9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{A8CDA8C9-7539-43EE-9076-F0C30C65DE2D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArcFramework", "ArcFramework\ArcFramework.vcxproj", "{32B26593-0254-4D0A-8859-B31E22112ABB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,9 +51,22 @@ Global
 		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Release|x64.Build.0 = Release|x64
 		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Release|x86.ActiveCfg = Release|Win32
 		{4899FAE4-63BC-4C80-8223-35BAA036C6EE}.Release|x86.Build.0 = Release|Win32
+		{32B26593-0254-4D0A-8859-B31E22112ABB}.Debug|x64.ActiveCfg = Debug|x64
+		{32B26593-0254-4D0A-8859-B31E22112ABB}.Debug|x86.ActiveCfg = Debug|Win32
+		{32B26593-0254-4D0A-8859-B31E22112ABB}.Debug|x86.Build.0 = Debug|Win32
+		{32B26593-0254-4D0A-8859-B31E22112ABB}.Release|x64.ActiveCfg = Release|x64
+		{32B26593-0254-4D0A-8859-B31E22112ABB}.Release|x64.Build.0 = Release|x64
+		{32B26593-0254-4D0A-8859-B31E22112ABB}.Release|x86.ActiveCfg = Release|Win32
+		{32B26593-0254-4D0A-8859-B31E22112ABB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{47D8E101-3300-4AF2-BFAB-A7F8446704FF} = {A8CDA8C9-7539-43EE-9076-F0C30C65DE2D}
+		{10EFF0D6-A8C2-4A2A-8E84-7D43C6E03CB7} = {E1104024-EA9A-4137-BA63-2534A82FFCF9}
+		{4899FAE4-63BC-4C80-8223-35BAA036C6EE} = {A8CDA8C9-7539-43EE-9076-F0C30C65DE2D}
+		{32B26593-0254-4D0A-8859-B31E22112ABB} = {A8CDA8C9-7539-43EE-9076-F0C30C65DE2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3B5AC6AE-9CFE-4D3E-B9B2-2BB7B1A27464}

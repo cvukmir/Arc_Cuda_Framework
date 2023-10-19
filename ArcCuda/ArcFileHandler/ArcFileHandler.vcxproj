@@ -46,7 +46,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -129,12 +129,10 @@
   <ItemGroup>
     <ClCompile Include="ArcFileAction.cpp" />
     <ClCompile Include="ArcFile.cpp" />
-    <ClCompile Include="ArcMatrix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArcFile.h" />
     <ClInclude Include="ArcFileAction.h" />
-    <ClInclude Include="ArcMatrix.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

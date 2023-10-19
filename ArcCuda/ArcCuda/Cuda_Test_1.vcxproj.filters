@@ -7,7 +7,7 @@
     <CudaCompile Include="ArcCudaDeviceProp.cu">
       <Filter>Cuda Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="kernel.cu">
+    <CudaCompile Include="ArcCudaNormalization.cu">
       <Filter>Cuda Source Files</Filter>
     </CudaCompile>
   </ItemGroup>
@@ -19,6 +19,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ArcCudaMatrixMultiply.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArcCudaNormalization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

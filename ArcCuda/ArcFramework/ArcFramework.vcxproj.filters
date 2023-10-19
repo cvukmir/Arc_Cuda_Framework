@@ -13,36 +13,14 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Notes">
-      <UniqueIdentifier>{0289a269-b587-49e1-be3d-ed2018fd17dd}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="ArcNatvis.natvis">
-      <Filter>Resource Files</Filter>
-    </Natvis>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Notes.txt">
-      <Filter>Notes</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="ArcMatrixMultiply.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ArcMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ArcNormalization.cpp">
+    <ClCompile Include="ArcMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ArcMatrixMultiply.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ArcNormalization.h">
+    <ClInclude Include="ArcMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

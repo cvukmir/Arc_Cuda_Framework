@@ -1,12 +1,12 @@
-// Cuda Libraries
+// Cuda
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
-
-// C++ Base
+// Std C++
 #include <string>
 
-class ArcCudaDeviceProp : cudaDeviceProp//ArcCudaDeviceProp, cudaDeviceProp
+
+class ArcCudaDeviceProp : cudaDeviceProp
 {
 public:
 	ArcCudaDeviceProp(const int deviceId);
