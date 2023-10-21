@@ -31,11 +31,6 @@ __global__ void matrixMultiplyDynamicShared(float* pMatrix1, float* pMatrix2, fl
 
 	for (int blockIndex = 0; blockIndex <= matrixSizeN / BLOCK_WIDTH; ++blockIndex) 
 	{
-		if (blockX == 0 && blockY == 1 && threadX == 0 && threadY == 0)
-		{
-			blockY = 1;
-		}
-
 		// Approach1: Add in a check for wrap around
 
 		// Loop over blocks

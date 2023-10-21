@@ -2,6 +2,7 @@
 #include <random>
 #include <math.h>
 #include <iostream>
+#include <chrono>
 
 // ArcMain
 #include "ArcNormalization.h"
@@ -42,19 +43,23 @@ bool ArcNormalization::performNormalization()
 
 	fillArray();
 
+	printArray();
+
 	if (!normalizeCpu())
 	{
 		return false;
 	}
 
-	printArray();
+	std::cout << "Normalized CPU value: " << _normalizedValue << "\n";
+
+	_normalizedValue = 0.0;
 
 	if (!normalizeGpu())
 	{
 		return false;
 	}
 
-	std::cout << "Normalized value: " << _normalizedValue << "\n";
+	std::cout << "Normalized GPU value: " << _normalizedValue << "\n";
 
 	return true;
 }
@@ -71,6 +76,8 @@ void ArcNormalization::clearArray()
 
 void ArcNormalization::fillArray()
 {
+	srand(unsigned int(time(NULL)));
+
 	for (int index = 0; index < _size; ++index)
 	{
 		_pArray[index] = (rand() / static_cast<float>(RAND_MAX)) * MAX_ARRAY_VALUE;
@@ -86,11 +93,14 @@ void ArcNormalization::initializeArray()
 
 void ArcNormalization::initializeSize()
 {
-	_size = static_cast<int>(rand() % 100 + 3);
+	srand(unsigned int(time(NULL)));
+	_size = static_cast<int>(rand() % 1000 + 3);
 }
 
 bool ArcNormalization::normalizeCpu()
 {
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 	float sumSquaredValue = 0.0;
 
 	for (int index = 0; index < _size; ++index)
@@ -99,6 +109,9 @@ bool ArcNormalization::normalizeCpu()
 	}
 
 	_normalizedValue = std::sqrt(sumSquaredValue);
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+	std::cout << "Normalization - Generated From CPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
 
 	return true;
 }

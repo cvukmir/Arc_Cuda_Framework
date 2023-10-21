@@ -12,11 +12,44 @@
 // ArcCuda
 #include "ArcCudaNormalization.h"
 
-const int BLOCK_WIDTH = 32; // AKA: TILE_WIDTH
+const int BLOCK_WIDTH = 1024; // AKA: TILE_WIDTH
 
 __global__ void normalizationKernel(float* pInputArray, int size, float* normalizedValue)
 {
-	(*normalizedValue) = 10.0;
+	__shared__ float partialSum[BLOCK_WIDTH];
+
+	unsigned int threadX = threadIdx.x;
+	unsigned int blockX  = blockIdx.x;
+
+	for (int blockIndex = 0; blockIndex <= size / BLOCK_WIDTH; ++blockIndex)
+	{
+		partialSum[threadX + (blockX * BLOCK_WIDTH)] = pInputArray[threadX + (blockX * BLOCK_WIDTH)] * pInputArray[threadX + (blockX * BLOCK_WIDTH)];
+
+		for (unsigned int stride = BLOCK_WIDTH >> 1; stride > 0; stride >>= 1)
+		{
+			__syncthreads();
+			if (threadX < stride)
+			{
+				partialSum[threadX] += partialSum[threadX + stride];
+			}
+		}
+
+		__syncthreads();
+	}
+
+	if (threadX + (blockX * BLOCK_WIDTH) >= size)
+	{
+		return;
+	}
+
+	(*normalizedValue) += partialSum[0];
+
+	if (threadX != 0 && blockX != 0)
+	{
+		return;
+	}
+
+	(*normalizedValue) = std::sqrtf(*normalizedValue);
 }
 
 
@@ -32,7 +65,7 @@ bool calcNormalization(float* pArray, const int size, float* normalizedValue)
 	cudaStatus = cudaSetDevice(0);
 	if (cudaStatus != cudaSuccess) 
 	{
-		std::cout << "Could not set cuda device.\n";
+		std::cout << "Could not set Cuda device.\n";
 		return false;
 	}
 
@@ -58,16 +91,15 @@ bool calcNormalization(float* pArray, const int size, float* normalizedValue)
 	if (cudaStatus != cudaSuccess) 
 	{
 		cudaFree(pCudaArray);
-		std::cout << "Could not copy the memory from the host first matrix to the device first array.\n";
+		std::cout << "Could not copy the memory from the host first array to the device first array.\n";
 		return false;
 	}
 
 	// Perform the normalization //
 
-	dim3 threadsPerBlock(1, 1);
-	dim3 numBlocks(1, 1);
-	//dim3 numBlocks(ceil(matrixSizeP / float(BLOCK_WIDTH)), ceil(matrixSizeM / float(BLOCK_WIDTH)));
-
+	dim3 threadsPerBlock(BLOCK_WIDTH);
+	dim3 numBlocks(ceil(size / float(BLOCK_WIDTH)));
+	
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	normalizationKernel<<<numBlocks, threadsPerBlock>>>(pCudaArray, size, cudaNormalizedValue);
@@ -90,7 +122,7 @@ bool calcNormalization(float* pArray, const int size, float* normalizedValue)
 	if (cudaStatus != cudaSuccess) 
 	{
 		cudaFree(pCudaArray);
-		std::cout << "Could not copy the memory from the device third matrix to the host third matrix.\n";
+		std::cout << "Could not copy the memory from the device third arra to the host third array.\n";
 		return false;
 	}
 
