@@ -21,6 +21,7 @@ ArcNormalization::ArcNormalization()
 	, _normalizedValue (0.00)
 	, _size   (0)
 {
+	srand(static_cast<unsigned int>(time(NULL)));
 }
 
 // Destructor(s) //
@@ -39,11 +40,13 @@ bool ArcNormalization::performNormalization()
 {
 	initializeSize();
 
+	std::cout << "Array size: " << _size << "\n";
+
 	initializeArray();
 
 	fillArray();
 
-	printArray();
+	//printArray();
 
 	if (!normalizeCpu())
 	{
@@ -76,8 +79,6 @@ void ArcNormalization::clearArray()
 
 void ArcNormalization::fillArray()
 {
-	srand(unsigned int(time(NULL)));
-
 	for (int index = 0; index < _size; ++index)
 	{
 		_pArray[index] = (rand() / static_cast<float>(RAND_MAX)) * MAX_ARRAY_VALUE;
@@ -93,8 +94,7 @@ void ArcNormalization::initializeArray()
 
 void ArcNormalization::initializeSize()
 {
-	srand(unsigned int(time(NULL)));
-	_size = static_cast<int>(rand() % 1000 + 3);
+	_size = static_cast<int>(rand() % 100000 + 3);
 }
 
 bool ArcNormalization::normalizeCpu()

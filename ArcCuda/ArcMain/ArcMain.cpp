@@ -2,6 +2,9 @@
 #include "ArcMatrixMultiply.h"
 #include "ArcNormalization.h"
 
+// Std C++
+#include <iostream>
+
 
 int main()
 {
@@ -13,10 +16,15 @@ int main()
 //	}
 
 	ArcNormalization normalizer;
-
-	if (!normalizer.performNormalization())
+	
+	for (int i = 0; i < 10; ++i)
 	{
-		return -1;
+		std::cout << "\n----------Normalizer Iteration " << i << "----------\n";
+
+		if (!normalizer.performNormalization())
+		{
+			return -1;
+		}
 	}
 
 	return 0;
