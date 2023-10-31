@@ -14,39 +14,34 @@
 
 const int BLOCK_WIDTH = 1024; // AKA: TILE_WIDTH
 
-__global__ void normalizationKernel(float* pInputArray, int size, float* normalizedValue)
+__global__ void sumArrayKernel(float* pInputArray, float* normalizedValue)
+{
+	atomicAdd(normalizedValue, pInputArray[threadIdx.x * BLOCK_WIDTH]);
+}
+
+__global__ void normalizationKernel(float* pInputArray, int size)
 {
 	__shared__ float partialSum[BLOCK_WIDTH];
 
 	unsigned int threadX = threadIdx.x;
 	unsigned int blockX  = blockIdx.x;
 
-	for (int blockIndex = 0; blockIndex <= size / BLOCK_WIDTH; ++blockIndex)
+	if ((blockX * BLOCK_WIDTH) + threadX < size)
 	{
-		if ((blockIndex * BLOCK_WIDTH) + threadX < size)
-		{
-			partialSum[threadX] = pInputArray[(blockIndex * BLOCK_WIDTH) + threadX] * pInputArray[(blockIndex * BLOCK_WIDTH) + threadX];
-		}
-		else
-		{
-			partialSum[threadX] = 0.0;
-		}
+		partialSum[threadX] = pInputArray[(blockX * BLOCK_WIDTH) + threadX] * pInputArray[(blockX * BLOCK_WIDTH) + threadX];
+	}
+	else
+	{
+		partialSum[threadX] = 0.0;
+	}
 
-		__syncthreads();
+	__syncthreads();
 
-		for (unsigned int stride = BLOCK_WIDTH >> 1; stride > 0; stride >>= 1)
+	for (unsigned int stride = BLOCK_WIDTH >> 1; stride > 0; stride >>= 1)
+	{
+		if (threadX < stride)
 		{
-			if (threadX < stride)
-			{
-				partialSum[threadX] += partialSum[threadX + stride];
-			}
-
-			__syncthreads();
-		}
-
-		if (threadX == 0)
-		{
-			(*normalizedValue) += partialSum[0];
+			partialSum[threadX] += partialSum[threadX + stride];
 		}
 
 		__syncthreads();
@@ -54,7 +49,7 @@ __global__ void normalizationKernel(float* pInputArray, int size, float* normali
 
 	if (threadX == 0)
 	{
-		(*normalizedValue) = std::sqrtf((*normalizedValue));
+		pInputArray[(blockX * BLOCK_WIDTH) + threadX] = partialSum[0];
 	}
 }
 
@@ -104,11 +99,16 @@ bool calcNormalization(float* pArray, const int size, float* normalizedValue)
 	// Perform the normalization //
 
 	dim3 threadsPerBlock(BLOCK_WIDTH);
-	dim3 numBlocks(1);//ceil(size / float(BLOCK_WIDTH)));
+	dim3 numBlocks = ceil(size / float(BLOCK_WIDTH));
 	
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-	normalizationKernel<<<numBlocks, threadsPerBlock>>>(pCudaArray, size, cudaNormalizedValue);
+	normalizationKernel<<<numBlocks, threadsPerBlock>>>(pCudaArray, size);
+
+	threadsPerBlock = std::min(static_cast<int>(ceil(size / float(BLOCK_WIDTH))), BLOCK_WIDTH) ;
+	numBlocks = ceil(threadsPerBlock.x / float(BLOCK_WIDTH));
+
+	sumArrayKernel<<<numBlocks, threadsPerBlock>>>(pCudaArray, cudaNormalizedValue);
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
@@ -131,6 +131,8 @@ bool calcNormalization(float* pArray, const int size, float* normalizedValue)
 		std::cout << "Could not copy the memory from the device normalized value to the host normalized value.\n";
 		return false;
 	}
+
+	(*normalizedValue) = std::sqrt(*normalizedValue);
 
 	cudaFree(pCudaArray);
 
