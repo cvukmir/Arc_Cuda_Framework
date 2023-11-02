@@ -2,12 +2,15 @@
 #include "ArcMatrixMultiply.h"
 #include "ArcNormalization.h"
 
+
+#include <wmpids.h>
 // Std C++
 #include <iostream>
 
 
 int main()
 {
+	
 //	ArcMatrixMultiply matrixMultiply;
 
 //	if (!matrixMultiply.performMatrixMultiplication())
