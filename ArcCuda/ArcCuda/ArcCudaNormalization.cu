@@ -105,14 +105,20 @@ bool calcNormalization(float* pArray, const int size, float* normalizedValue)
 
 	normalizationKernel<<<numBlocks, threadsPerBlock>>>(pCudaArray, size);
 
-	threadsPerBlock = std::min(static_cast<int>(ceil(size / float(BLOCK_WIDTH))), BLOCK_WIDTH) ;
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+	std::cout << "Normalization Reduction - Generated From GPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
+
+	threadsPerBlock = std::min(static_cast<int>(ceil(size / float(BLOCK_WIDTH))), BLOCK_WIDTH);
 	numBlocks = ceil(threadsPerBlock.x / float(BLOCK_WIDTH));
+
+	begin = std::chrono::steady_clock::now();
 
 	sumArrayKernel<<<numBlocks, threadsPerBlock>>>(pCudaArray, cudaNormalizedValue);
 
-	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	end = std::chrono::steady_clock::now();
 
-	std::cout << "Normalization - Generated From GPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
+	std::cout << "Normalization Summation - Generated From GPU in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << " nanoseconds." << '\n';
 
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess) 

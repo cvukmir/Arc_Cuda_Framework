@@ -2,13 +2,14 @@
 #include "ArcMatrixMultiply.h"
 #include "ArcNormalization.h"
 
+// ArcMpi
+#include "ArcMpi.h"
 
-#include <wmpids.h>
 // Std C++
 #include <iostream>
 
 
-int main()
+int main(int argc, char* argv[])
 {
 	
 //	ArcMatrixMultiply matrixMultiply;
@@ -18,17 +19,22 @@ int main()
 //		return -1;
 //	}
 
-	ArcNormalization normalizer;
+//	ArcNormalization normalizer;
 	
-	for (int i = 0; i < 10; ++i)
-	{
-		std::cout << "\n----------Normalizer Iteration " << i << "----------\n";
+//	for (int i = 0; i < 10; ++i)
+//	{
+//		std::cout << "\n----------Normalizer Iteration " << i << "----------\n";
+//
+//		if (!normalizer.performNormalization())
+//		{
+//			return -1;
+//		}
+//	}
 
-		if (!normalizer.performNormalization())
-		{
-			return -1;
-		}
-	}
+	//int test = 0;
+	//char* test2[1];
+	ArcMpi test;
+	test.test(&argc, &argv);
 
 	return 0;
 }
