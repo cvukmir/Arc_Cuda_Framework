@@ -6,6 +6,8 @@
 
 #include <cstring>
 #include <iostream>
+#include <iomanip>
+#include <cstdlib>
 
 // Part 1:
 // Rank 0 sends an int 0 to rank 1 and prints statement
@@ -21,32 +23,167 @@
 
 int main(int argc, char* argv[])
 {
-	ArcMpi::test(&argc, &argv);
+	MPI_Init(&argc, &argv);
+	
+	int rankCount = 0;
+	int myRank    = 0;
+
+	int value = 0;
+
+	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &rankCount);
+
+	if (myRank == 0)
+	{
+		std::cout << "Rank Count: " << rankCount << std::endl;
+
+		std::cout << std::endl << "---Part 1---" << std::endl;
+	}
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	ArcMpi::part1(myRank, rankCount);
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	if (myRank == 0)
+	{
+		std::cout << std::endl << "---Part 2---" << std::endl;
+	}
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	ArcMpi::part2(myRank, rankCount);
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	MPI_Finalize();
+
 	return 0;
 }
 
 void ArcMpi::test(int* argc, char*** argv)
 {
-	char message[20];
-	int myrank;
-	MPI_Status status;
-	MPI_Init(argc, argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-	
-	std::cout << "Hello my rank is: " << myrank << "\n";
-	//MPI_Comm_size(MPI_COMM_WORLD, )
-	//std::cout << "Comm Size: " <<
-	/*
-	if (myrank == 0) 
+	//char message[20];
+	//int myrank;
+	//MPI_Status status;
+	//
+	//std::cout << "Hello my rank is: " << myrank << "\n";
+	//
+	//if (myrank == 0) 
+	//{
+	//	strcpy_s(message, "Hello, there");
+	//	MPI_Send(message, strlen(message) + 1, MPI_CHAR, 1, 99, MPI_COMM_WORLD);
+	//}
+	//else if (myrank == 1)
+	//{
+	//	MPI_Recv(message, 20, MPI_CHAR, 0, 99, MPI_COMM_WORLD, &status);
+	//	printf("received :%s:\n", message);
+	//}
+}
+
+void ArcMpi::part1(const int myRank, const int rankCount)
+{
+	if (rankCount == 1)
 	{
-		strcpy_s(message, "Hello, there");
-		MPI_Send(message, strlen(message) + 1, MPI_CHAR, 1, 99, MPI_COMM_WORLD);
+		std::cout << "Only one rank called, part 1 not executed." << std::endl;
+		return;
 	}
-	else if (myrank == 1)
+
+	MPI_Status status;
+	int value = 0;
+
+	if (myRank == 0)
 	{
-		MPI_Recv(message, 20, MPI_CHAR, 0, 99, MPI_COMM_WORLD, &status);
-		printf("received :%s:\n", message);
-	}*/
-	
-	MPI_Finalize();
+		value = 0;
+
+		std::cout << "Rank " << myRank << " initial value: " << value << std::endl;
+
+		MPI_Send(&value, 1, MPI_INT, myRank    + 1, 99, MPI_COMM_WORLD);
+		MPI_Recv(&value, 1, MPI_INT, rankCount - 1, 99, MPI_COMM_WORLD, &status);
+
+		std::cout << "Rank " << myRank << " recieved value: " << value << std::endl;
+	}
+	else if (myRank == rankCount - 1)
+	{
+		MPI_Recv(&value, 1, MPI_INT, myRank - 1, 99, MPI_COMM_WORLD, &status);
+
+		std::cout << "Rank " << myRank << " recieved value: " << value << std::endl;
+
+		value += 1;
+
+		std::cout << "Rank " << myRank << " sending value: " << value << std::endl;
+
+		MPI_Send(&value, 1, MPI_INT, 0,    99, MPI_COMM_WORLD);
+	}
+	else
+	{
+		MPI_Recv(&value, 1, MPI_INT, myRank - 1, 99, MPI_COMM_WORLD, &status);
+
+		std::cout << "Rank " << myRank << " recieved a value: " << value << std::endl;
+
+		value += 1;
+
+		std::cout << "Rank " << myRank << " sending value: " << value << std::endl;
+
+		MPI_Send(&value, 1, MPI_INT, myRank + 1, 99, MPI_COMM_WORLD);
+	}
+}
+
+void ArcMpi::part2(const int myRank, const int rankCount)
+{
+	if (rankCount == 1)
+	{
+		std::cout << "Only one rank called, part 2 not executed." << std::endl;
+		return;
+	}
+
+	MPI_Status status;
+	int value = 0;
+
+	if (myRank == 0)
+	{
+		value = 0;
+
+		std::cout << "Rank " << myRank << " sending value: " << value << std::endl;
+
+		MPI_Send(&value, 1, MPI_INT, myRank    + 1, 99, MPI_COMM_WORLD);
+		MPI_Recv(&value, 1, MPI_INT, myRank + 1, 99, MPI_COMM_WORLD, &status);
+
+		std::cout << "Rank " << myRank << " recieved value: " << value << std::endl;
+	}
+	else if (myRank == rankCount - 1)
+	{
+		MPI_Recv(&value, 1, MPI_INT, myRank - 1, 99, MPI_COMM_WORLD, &status);
+
+		std::cout << "Rank " << myRank << " recieved value: " << value << std::endl;
+
+		value -= 1;
+
+		std::cout << "Rank " << myRank << " sending value: " << value << std::endl;
+
+		MPI_Send(&value, 1, MPI_INT, myRank - 1, 99, MPI_COMM_WORLD);
+	}
+	else
+	{
+		MPI_Recv(&value, 1, MPI_INT, myRank - 1, 99, MPI_COMM_WORLD, &status);
+
+		std::cout << "Rank " << myRank << " recieved a value: " << value << std::endl;
+
+		value += 1;
+
+		std::cout << "Rank " << myRank << " sending value: " << value << std::endl;
+
+		MPI_Send(&value, 1, MPI_INT, myRank + 1, 99, MPI_COMM_WORLD);
+
+		MPI_Recv(&value, 1, MPI_INT, myRank + 1, 99, MPI_COMM_WORLD, &status);
+
+		std::cout << "Rank " << myRank << " recieved value: " << value << std::endl;
+
+		value -= 1;
+
+		std::cout << "Rank " << myRank << " sending value: " << value << std::endl;
+
+		MPI_Send(&value, 1, MPI_INT, myRank - 1, 99, MPI_COMM_WORLD);
+	}
 }
