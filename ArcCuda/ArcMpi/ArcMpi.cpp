@@ -21,6 +21,11 @@
 // instead of sending to rank 0, send back down the rank numbers.
 // Decrement the sent value.
 
+// Part3:
+// Broadcast where rank 0 sends a value to every thread but efficiently
+// Rank 0 sends to 1 and both send to two more which send to 8 more and so on.
+//
+
 int main(int argc, char* argv[])
 {
 	MPI_Init(&argc, &argv);
@@ -40,46 +45,26 @@ int main(int argc, char* argv[])
 		std::cout << std::endl << "---Part 1---" << std::endl;
 	}
 
-	MPI_Barrier(MPI_COMM_WORLD);
+	//MPI_Barrier(MPI_COMM_WORLD);
 
 	ArcMpi::part1(myRank, rankCount);
 
-	MPI_Barrier(MPI_COMM_WORLD);
+	//MPI_Barrier(MPI_COMM_WORLD);
 
 	if (myRank == 0)
 	{
 		std::cout << std::endl << "---Part 2---" << std::endl;
 	}
 
-	MPI_Barrier(MPI_COMM_WORLD);
+	//MPI_Barrier(MPI_COMM_WORLD);
 
 	ArcMpi::part2(myRank, rankCount);
 
-	MPI_Barrier(MPI_COMM_WORLD);
+	//MPI_Barrier(MPI_COMM_WORLD);
 
 	MPI_Finalize();
 
 	return 0;
-}
-
-void ArcMpi::test(int* argc, char*** argv)
-{
-	//char message[20];
-	//int myrank;
-	//MPI_Status status;
-	//
-	//std::cout << "Hello my rank is: " << myrank << "\n";
-	//
-	//if (myrank == 0) 
-	//{
-	//	strcpy_s(message, "Hello, there");
-	//	MPI_Send(message, strlen(message) + 1, MPI_CHAR, 1, 99, MPI_COMM_WORLD);
-	//}
-	//else if (myrank == 1)
-	//{
-	//	MPI_Recv(message, 20, MPI_CHAR, 0, 99, MPI_COMM_WORLD, &status);
-	//	printf("received :%s:\n", message);
-	//}
 }
 
 void ArcMpi::part1(const int myRank, const int rankCount)
