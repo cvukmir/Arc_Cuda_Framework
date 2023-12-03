@@ -6,6 +6,7 @@ class ArcMpi
 public:
 	static void assignment1();
 	static void assignment2();
+	static void assignment3();
 
 	static void baseline(const int myRank, const int rankCount, int* value, const int valueCount);
 

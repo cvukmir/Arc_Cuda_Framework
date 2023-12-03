@@ -43,7 +43,9 @@ int main(int argc, char* argv[])
 	
 	//ArcMpi::assignment1();
 
-	ArcMpi::assignment2();
+	//ArcMpi::assignment2();
+
+	ArcMpi::assignment3();
 
 	MPI_Finalize();
 
@@ -162,6 +164,74 @@ void ArcMpi::assignment2()
 	//{
 	//	std::cout << "Sent data to ranks sequentially in " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " microseconds." << '\n';
 	//}
+}
+
+void ArcMpi::assignment3()
+{
+	// Split up tasks based on ranks.
+	int rankCount      = 0;
+	int myRank         = 0;
+	int gameIterations = 10;
+
+	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &rankCount);
+
+	if (myRank == 0)
+	{
+		// Initialize the grid
+		size_t arraySize = 10;
+		bool* pMatrix = new bool[arraySize * arraySize];
+
+		srand(unsigned int(time(NULL)));
+
+		for (int rowIndex = 0; rowIndex < arraySize; ++rowIndex)
+		{
+			for (int columnIndex = 0; columnIndex < arraySize; ++columnIndex)
+			{
+				pMatrix[rowIndex * arraySize + columnIndex] = rand() % 2 == 0 ? false : true;
+			}
+		}
+
+		std::cout << "Printing the initial grid state." << '\n';
+
+		for (int rowIndex = 0; rowIndex < arraySize; ++rowIndex)
+		{
+			for (int columnIndex = 0; columnIndex < arraySize; ++columnIndex)
+			{
+				std::cout << pMatrix[rowIndex * arraySize + columnIndex] << ' ';
+			}
+
+			std::cout << '\n';
+		}
+
+		for (int iterationNumber = 1; iterationNumber <= gameIterations; ++iterationNumber)
+		{
+			std::cout << "Starting game iteration " << iterationNumber << '\n';
+
+			// Figure out optimal way to split up data.
+
+
+			std::cout << "Print game state after iteration " << iterationNumber << '\n';
+
+			for (int rowIndex = 0; rowIndex < arraySize; ++rowIndex)
+			{
+				for (int columnIndex = 0; columnIndex < arraySize; ++columnIndex)
+				{
+					std::cout << pMatrix[rowIndex * arraySize + columnIndex] << ' ';
+				}
+
+				std::cout << '\n';
+			}
+		}
+
+		std::cout << "Closing game." << '\n';
+
+		delete[] pMatrix;
+	}
+	else
+	{
+
+	}
 }
 
 void ArcMpi::baseline(const int myRank, const int rankCount, int* value, const int size)
