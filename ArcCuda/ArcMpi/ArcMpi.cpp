@@ -170,54 +170,130 @@ void ArcMpi::assignment3()
 {
 	// Split up tasks based on ranks.
 	int rankCount      = 0;
+	int childRankCount = 0;
 	int myRank         = 0;
 	int gameIterations = 10;
+	MPI_Status status;
+
+	// Matrix Constants
+	const size_t haloSize = 1;
+	const size_t rowSize  = 10;
+	const size_t colSize  = 10;
 
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 	MPI_Comm_size(MPI_COMM_WORLD, &rankCount);
+	childRankCount = rankCount - 1;
+
+	if (ceil((double)sqrt(static_cast<double>(childRankCount))) != floor((double)sqrt(static_cast<double>(childRankCount))))
+	{
+		std::cout << "Thread count must be an even square." << '\n';
+		return;
+	}
+
+	// Determine size of subarrays
+	int sqrtRankCount = sqrt(childRankCount);
+	
+	if (colSize < sqrtRankCount || rowSize < sqrtRankCount)
+	{
+		std::cout << "Too small of a grid size/too many threads." << '\n';
+		return;
+	}
+
+	// Subarray constants.
+	const size_t subMatrixRowSize = static_cast<size_t>(ceil(rowSize / static_cast<double>(sqrtRankCount))) + haloSize;
+	const size_t subMatrixColSize = static_cast<size_t>(ceil(colSize / static_cast<double>(sqrtRankCount))) + haloSize;
 
 	if (myRank == 0)
 	{
 		// Initialize the grid
-		size_t arraySize = 10;
-		bool* pMatrix = new bool[arraySize * arraySize];
+		bool* pMatrix = new bool[rowSize * colSize];
 
 		srand(unsigned int(time(NULL)));
 
-		for (int rowIndex = 0; rowIndex < arraySize; ++rowIndex)
+		for (int rowIndex = 0; rowIndex < rowSize; ++rowIndex)
 		{
-			for (int columnIndex = 0; columnIndex < arraySize; ++columnIndex)
+			for (int columnIndex = 0; columnIndex < colSize; ++columnIndex)
 			{
-				pMatrix[rowIndex * arraySize + columnIndex] = rand() % 2 == 0 ? false : true;
+				pMatrix[rowIndex * rowSize + columnIndex] = rand() % 2 == 0 ? false : true;
 			}
 		}
 
 		std::cout << "Printing the initial grid state." << '\n';
 
-		for (int rowIndex = 0; rowIndex < arraySize; ++rowIndex)
+		for (int rowIndex = 0; rowIndex < rowSize; ++rowIndex)
 		{
-			for (int columnIndex = 0; columnIndex < arraySize; ++columnIndex)
+			for (int columnIndex = 0; columnIndex < colSize; ++columnIndex)
 			{
-				std::cout << pMatrix[rowIndex * arraySize + columnIndex] << ' ';
+				std::cout << pMatrix[rowIndex * rowSize + columnIndex] << ' ';
 			}
 
 			std::cout << '\n';
 		}
 
+		bool* pSubMatrix = new bool[subMatrixRowSize * subMatrixColSize];
+
+		// Start the game!
 		for (int iterationNumber = 1; iterationNumber <= gameIterations; ++iterationNumber)
 		{
 			std::cout << "Starting game iteration " << iterationNumber << '\n';
 
-			// Figure out optimal way to split up data.
+			// Send the data to each rank.
+			for (int rankIndex = 1; rankIndex < childRankCount; ++rankIndex)
+			{
+				// Get data from grid.
+				for (int subMatrixRowIndex = 0; subMatrixRowIndex < subMatrixRowSize; ++subMatrixRowIndex)
+				{
+					for (int subMatrixColumnIndex = 0; subMatrixColumnIndex < subMatrixColSize; ++subMatrixColumnIndex)
+					{
+						// Out of bounds (OOB) conditions:
+						// Top    halo (always OOB)
+						// Left   halo (always OOB)
+						// Bottom halo
+						// Right  halo
+						if (subMatrixRowIndex    < subMatrixRowSize - (sqrtRankCount + haloSize) ||
+							subMatrixColumnIndex < subMatrixColSize - (sqrtRankCount + haloSize) ||
+							)
+						{
+							continue;
 
+						}
+						else if (subMatrixRowIndex > sqrtRankCount + haloSize)
+						{
+							// Bottom halo
+
+						}
+						else if (subMatrixColumnIndex > sqrtRankCount + haloSize)
+						{
+							// Right halo
+
+						}
+						else
+						{
+							pSubMatrix[(subMatrixRowIndex * subMatrixRowSize) + subMatrixColumnIndex] = pMatrix[(rankIndex % childRankCount) * (subMatrixRowIndex * subMatrixRowSize)) + (rankIndex * subMatrixColumnIndex)];
+						}
+					}
+				}
+
+				// Send data to rank.
+				MPI_Send(pSubMatrix, subMatrixRowSize * subMatrixColSize, MPI_C_BOOL, rankIndex, 99, MPI_COMM_WORLD);
+			}
+
+			// Receive the data to each rank.
+			for (int rankIndex = 1; rankIndex < childRankCount; ++rankIndex)
+			{
+				// Receieve data.
+				MPI_Recv(pSubMatrix, subMatrixRowSize * subMatrixColSize, MPI_C_BOOL, rankIndex, 99, MPI_COMM_WORLD, &status);
+
+				// Overrite grid.
+			}
 
 			std::cout << "Print game state after iteration " << iterationNumber << '\n';
 
-			for (int rowIndex = 0; rowIndex < arraySize; ++rowIndex)
+			for (int rowIndex = 0; rowIndex < rowSize; ++rowIndex)
 			{
-				for (int columnIndex = 0; columnIndex < arraySize; ++columnIndex)
+				for (int columnIndex = 0; columnIndex < colSize; ++columnIndex)
 				{
-					std::cout << pMatrix[rowIndex * arraySize + columnIndex] << ' ';
+					std::cout << pMatrix[rowIndex * rowSize + columnIndex] << ' ';
 				}
 
 				std::cout << '\n';
@@ -230,7 +306,29 @@ void ArcMpi::assignment3()
 	}
 	else
 	{
+		bool* pSubMatrix = new bool[subMatrixRowSize * subMatrixColSize];
+		for (int iterationNumber = 1; iterationNumber <= gameIterations; ++iterationNumber)
+		{
+			// Receive data
+			MPI_Recv(pSubMatrix, subMatrixRowSize * subMatrixColSize, MPI_C_BOOL, 0, 99, MPI_COMM_WORLD, &status);
 
+			// Update state
+			for (int subMatrixRowIndex = 0; subMatrixRowIndex < subMatrixRowSize; ++subMatrixRowIndex)
+			{
+				for (int subMatrixColumnIndex = 0; subMatrixColumnIndex < subMatrixColSize; ++subMatrixColumnIndex)
+				{
+					// 1. Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+					// 2. Any live cell with two or three live neighbours lives on to the next generation.
+					// 3. Any live cell with more than three live neighbours dies, as if by overpopulation.
+					// 4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+				}
+			}
+
+			// Send data
+			MPI_Send(pSubMatrix, subMatrixRowSize * subMatrixColSize, MPI_C_BOOL, 0, 99, MPI_COMM_WORLD);
+		}
+
+		delete[] pSubMatrix;
 	}
 }
 
@@ -388,17 +486,17 @@ void ArcMpi::part2(const int myRank, const int rankCount)
 	}
 }
 
-void ArcMpi::sequentialSend(const int myRank, const int rankCount, const int* value, const int size)
+void ArcMpi::sequentialSend(const int myRank, const int rankCount, const int* value, const int valueCount)
 {
 	for (int i = 1; i < rankCount; ++i)
 	{
-		MPI_Send(value, size, MPI_INT, i, 99, MPI_COMM_WORLD);
+		MPI_Send(value, valueCount, MPI_INT, i, 99, MPI_COMM_WORLD);
 		//std::cout << "Rank " << myRank << " sent value " << value << " to rank " << i << std::endl;
 	}
 }
 
-void ArcMpi::sequentialRecv(const int myRank, const int rankCount, int* value, const int size)
+void ArcMpi::sequentialRecv(const int myRank, const int rankCount, int* value, const int valueCount)
 {
 	MPI_Status status;
-	MPI_Recv(value, size, MPI_INT, MPI_ANY_SOURCE, 99, MPI_COMM_WORLD, &status);
+	MPI_Recv(value, valueCount, MPI_INT, MPI_ANY_SOURCE, 99, MPI_COMM_WORLD, &status);
 }
